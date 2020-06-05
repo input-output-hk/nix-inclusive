@@ -1,6 +1,6 @@
-# Whitelist function for Nix
+# Inclusive file selection function for Nix
 
-This is simply a function that helps whitelisting files from more complex
+This is simply a function that helps selecting files from more complex
 directory structures.
 
 This is sometimes preferrable over simple filters or gitignore implementations
@@ -16,7 +16,7 @@ stdenv.mkDerivation {
 
   ...
 
-  src = whitelist ./. [
+  src = inclusive ./. [
     ./something.sh
     ./otherthing.rb
     ./some/nested/thing
@@ -25,3 +25,10 @@ stdenv.mkDerivation {
   ...
 }
 ```
+
+## Notes
+
+* Directories will be added recursively
+* Only path types are allowed in the inclusive list.
+* There is an issue that selecting a directory and later a subdirectory may
+  only add the latter one.
