@@ -32,3 +32,23 @@ stdenv.mkDerivation {
 * Only path types are allowed in the inclusive list.
 * There is an issue that selecting a directory and later a subdirectory may
   only add the latter one.
+
+## Installing with niv
+
+```
+$ niv add manveru/nix-inclusive
+```
+
+Then:
+
+```nix
+{ sources ? import ./sources.nix }:     # import the sources
+let
+  overlay = _: pkgs: {
+    manveru.nix-inclusive = pkgs.callPackage "${sources.nix-inclusive}/inclusive.nix" {};
+  };
+in import sources.nixpkgs
+  { overlays = [ overlay ] ; config = {}; }
+```
+
+and then use `src = pkgs.manveru.nix-inclusive ./. [ ... ]`
