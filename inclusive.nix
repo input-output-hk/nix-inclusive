@@ -19,6 +19,29 @@ let
 
   pathToParts = path: (__tail (lib.splitString "/" (toString path)));
 
+  # Require that every path specified does exist.
+  #
+  # By default, Nix won't complain if you refer to a missing file
+  # if you don't actually use it:
+  #
+  #     nix-repl> ./bogus
+  #     /home/grahamc/playground/bogus
+  #
+  #     nix-repl> toString ./bogus
+  #     "/home/grahamc/playground/bogus"
+  #
+  # so in order for this interface to be *exact*, we must
+  # specifically require every provided path exists:
+  #
+  #     nix-repl> "${./bogus}"
+  #     error: getting attributes of path
+  #     '/home/grahamc/playground/bogus': No such file or
+  #     directory
+  requireAllPathsExist = paths: let
+    validation = builtins.map (path: "${path}") paths;
+  in
+    builtins.deepSeq validation paths;
+
   isIncluded = patterns: name: type:
     let
       parts = pathToParts name;
@@ -28,7 +51,8 @@ let
 
   inclusive = root: allowedPaths:
     let
-      patterns = mkInclusive allowedPaths;
+      verifiedPaths = requireAllPathsExist allowedPaths;
+      patterns = mkInclusive verifiedPaths;
       filter = isIncluded patterns;
     in __filterSource filter root;
 in inclusive
