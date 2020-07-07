@@ -37,10 +37,14 @@ let
   #     error: getting attributes of path
   #     '/home/grahamc/playground/bogus': No such file or
   #     directory
-  requireAllPathsExist = paths: let
-    validation = builtins.map (path: "${path}") paths;
-  in
-    builtins.deepSeq validation paths;
+  requireAllPathsExist = paths:
+    let
+      validation = builtins.map (path:
+        builtins.path {
+          name = "verify";
+          path = path;
+        }) paths;
+    in builtins.deepSeq validation paths;
 
   isIncluded = patterns: name: type:
     let
