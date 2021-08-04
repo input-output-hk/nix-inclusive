@@ -17,7 +17,7 @@ let
         prefixes = [ ];
       } allowedPaths;
 
-  pathToParts = path: (__tail (lib.splitString "/" (toString path)));
+  pathToParts = path: (builtins.tail (lib.splitString "/" (toString path)));
 
   # Require that every path specified does exist.
   #
@@ -58,5 +58,9 @@ let
       verifiedPaths = requireAllPathsExist allowedPaths;
       patterns = mkInclusive verifiedPaths;
       filter = isIncluded patterns;
-    in __filterSource filter root;
+    in builtins.path {
+      name = "inclusive";
+      path = root;
+      filter = filter;
+    };
 in inclusive
